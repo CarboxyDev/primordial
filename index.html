@@ -250,11 +250,38 @@
       <i class="fas fa-search"></i>
     </div>
 
+    <!-- Action Selector Panel -->
+    <div id="actionSelector" class="action-selector">
+      <div class="action-header">
+        <i class="fas fa-mouse-pointer"></i>
+        <span>Click Action</span>
+      </div>
+      <div class="action-buttons">
+        <button class="action-btn active" data-action="food" title="Add Food">
+          <i class="fas fa-apple-alt"></i>
+          <span>Food</span>
+        </button>
+        <button class="action-btn" data-action="herbivore" title="Add Herbivore">
+          <div class="creature-icon herbivore"></div>
+          <span>Herbivore</span>
+        </button>
+        <button class="action-btn" data-action="carnivore" title="Add Carnivore">
+          <div class="creature-icon carnivore"></div>
+          <span>Carnivore</span>
+        </button>
+        <button class="action-btn" data-action="omnivore" title="Add Omnivore">
+          <div class="creature-icon omnivore"></div>
+          <span>Omnivore</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Help Tooltip -->
     <div id="helpTooltip" class="tooltip">
       <div class="tooltip-content">
         <strong>Controls:</strong><br>
-        • Click: Add food<br>
+        • Click: Add selected item<br>
+        • F/H/C/O: Select Food/Herbivore/Carnivore/Omnivore<br>
         • Space: Pause/Resume<br>
         • 1-4: Change speed<br>
         • Click organism: Inspect

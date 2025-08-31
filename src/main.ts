@@ -524,8 +524,8 @@ interface EnhancedStats extends Stats {
   foodScarcity: number;
   dayNightPhase: number;
   fps: number;
-  populationTrend: 'up' | 'down' | 'stable';
-  foodTrend: 'up' | 'down' | 'stable';
+  populationTrend: "up" | "down" | "stable";
+  foodTrend: "up" | "down" | "stable";
 }
 
 interface SimulationSettings {
@@ -546,7 +546,8 @@ class EnhancedStatsManager {
   private lastFrameTime: number = 0;
 
   constructor() {
-    this.tooltip = document.getElementById('statsTooltip') || document.createElement('div');
+    this.tooltip =
+      document.getElementById("statsTooltip") || document.createElement("div");
     setTimeout(() => this.setupEventListeners(), 100); // Defer setup to ensure DOM is ready
   }
 
@@ -557,12 +558,12 @@ class EnhancedStatsManager {
 
   showTooltip(event: MouseEvent, text: string): void {
     this.tooltip.textContent = text;
-    this.tooltip.classList.add('visible');
+    this.tooltip.classList.add("visible");
     this.updateTooltipPosition(event);
   }
 
   hideTooltip(): void {
-    this.tooltip.classList.remove('visible');
+    this.tooltip.classList.remove("visible");
   }
 
   updateTooltipPosition(event: MouseEvent): void {
@@ -577,20 +578,22 @@ class EnhancedStatsManager {
       y = event.clientY + 10;
     }
 
-    this.tooltip.style.left = x + 'px';
-    this.tooltip.style.top = y + 'px';
+    this.tooltip.style.left = x + "px";
+    this.tooltip.style.top = y + "px";
   }
 
   calculateGeneticDiversity(organisms: Organism[]): number {
     if (organisms.length === 0) return 0;
 
-    const traits = ['speed', 'efficiency', 'aggression', 'size', 'socialness'];
+    const traits = ["speed", "efficiency", "aggression", "size", "socialness"];
     let totalVariance = 0;
 
     for (const trait of traits) {
-      const values = organisms.map(org => (org.dna as any)[trait]);
+      const values = organisms.map((org) => (org.dna as any)[trait]);
       const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+      const variance =
+        values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+        values.length;
       totalVariance += variance;
     }
 
@@ -599,25 +602,31 @@ class EnhancedStatsManager {
 
   calculateSelectionPressure(organisms: Organism[], food: Food[]): number {
     if (organisms.length === 0) return 0;
-    
+
     const foodPerOrganism = food.length / organisms.length;
-    const avgEnergy = organisms.reduce((sum, org) => sum + org.energy, 0) / organisms.length;
-    const maxPossibleEnergy = organisms.reduce((sum, org) => sum + org.maxEnergy, 0) / organisms.length;
-    
+    const avgEnergy =
+      organisms.reduce((sum, org) => sum + org.energy, 0) / organisms.length;
+    const maxPossibleEnergy =
+      organisms.reduce((sum, org) => sum + org.maxEnergy, 0) / organisms.length;
+
     const energyRatio = avgEnergy / maxPossibleEnergy;
     const foodPressure = Math.max(0, 1 - foodPerOrganism / 2);
-    
+
     return Math.min(100, (foodPressure + (1 - energyRatio)) * 50);
   }
 
   calculatePredationRate(organisms: Organism[]): number {
-    const carnivores = organisms.filter(org => org.species === SpeciesType.CARNIVORE).length;
-    const aggressiveOmnivores = organisms.filter(org => 
-      org.species === SpeciesType.OMNIVORE && org.dna.aggression > 0.6
+    const carnivores = organisms.filter(
+      (org) => org.species === SpeciesType.CARNIVORE
+    ).length;
+    const aggressiveOmnivores = organisms.filter(
+      (org) => org.species === SpeciesType.OMNIVORE && org.dna.aggression > 0.6
     ).length;
     const totalPredators = carnivores + aggressiveOmnivores;
-    const totalPrey = organisms.filter(org => org.species === SpeciesType.HERBIVORE).length;
-    
+    const totalPrey = organisms.filter(
+      (org) => org.species === SpeciesType.HERBIVORE
+    ).length;
+
     if (totalPrey === 0) return 0;
     return Math.min(100, (totalPredators / totalPrey) * 100);
   }
@@ -638,23 +647,29 @@ class EnhancedStatsManager {
       }
     }
     this.lastFrameTime = now;
-    
+
     if (this.fpsCounter.length === 0) return 60;
-    return Math.round(this.fpsCounter.reduce((sum, fps) => sum + fps, 0) / this.fpsCounter.length);
+    return Math.round(
+      this.fpsCounter.reduce((sum, fps) => sum + fps, 0) /
+        this.fpsCounter.length
+    );
   }
 
-  getTrend(current: number, previous: number | undefined): 'up' | 'down' | 'stable' {
-    if (previous === undefined) return 'stable';
+  getTrend(
+    current: number,
+    previous: number | undefined
+  ): "up" | "down" | "stable" {
+    if (previous === undefined) return "stable";
     const diff = current - previous;
     const threshold = Math.abs(previous) * 0.05; // 5% threshold
-    
-    if (Math.abs(diff) < threshold) return 'stable';
-    return diff > 0 ? 'up' : 'down';
+
+    if (Math.abs(diff) < threshold) return "stable";
+    return diff > 0 ? "up" : "down";
   }
 
   updateEnhancedStats(organisms: Organism[], food: Food[], world: World): void {
     const basicStats = world.stats;
-    
+
     const enhancedStats: EnhancedStats = {
       ...basicStats,
       geneticDiversity: this.calculateGeneticDiversity(organisms),
@@ -664,17 +679,23 @@ class EnhancedStatsManager {
       foodScarcity: this.calculateFoodScarcity(organisms, food),
       dayNightPhase: (world.time % 7200) / 7200,
       fps: this.calculateFPS(),
-      populationTrend: this.getTrend(basicStats.totalPopulation, this.previousStats?.totalPopulation),
-      foodTrend: this.getTrend(basicStats.foodCount, this.previousStats?.foodCount)
+      populationTrend: this.getTrend(
+        basicStats.totalPopulation,
+        this.previousStats?.totalPopulation
+      ),
+      foodTrend: this.getTrend(
+        basicStats.foodCount,
+        this.previousStats?.foodCount
+      ),
     };
 
     this.updateUI(enhancedStats, world);
     this.previousStats = enhancedStats;
   }
 
-  updateUI(stats: EnhancedStats, world: World): void {
+  updateUI(stats: EnhancedStats, _world: World): void {
     // Update population count in sidebar
-    this.updateElement('pop-count', stats.totalPopulation.toString());
+    this.updateElement("pop-count", stats.totalPopulation.toString());
   }
 
   updateElement(id: string, value: string): void {
@@ -682,7 +703,7 @@ class EnhancedStatsManager {
     if (element) element.textContent = value;
   }
 
-  updateTrend(id: string, trend: 'up' | 'down' | 'stable'): void {
+  updateTrend(id: string, trend: "up" | "down" | "stable"): void {
     const element = document.getElementById(id);
     if (element) {
       element.className = `trend-indicator ${trend}`;
@@ -697,47 +718,58 @@ class EnhancedStatsManager {
   }
 
   getHealthClass(value: number): string {
-    if (value >= 70) return 'good';
-    if (value >= 40) return 'warning';
-    return 'danger';
+    if (value >= 70) return "good";
+    if (value >= 40) return "warning";
+    return "danger";
   }
 
   getPressureLabel(value: number): string {
-    if (value >= 70) return 'High';
-    if (value >= 40) return 'Medium';
-    return 'Low';
+    if (value >= 70) return "High";
+    if (value >= 40) return "Medium";
+    return "Low";
   }
 
   getScarcityLabel(value: number): string {
-    if (value >= 70) return 'High';
-    if (value >= 40) return 'Medium';
-    return 'Low';
+    if (value >= 70) return "High";
+    if (value >= 40) return "Medium";
+    return "Low";
   }
 
   updateDayNight(phase: number): void {
     const dayPhase = Math.sin(phase * Math.PI * 2);
-    const icon = document.getElementById('day-night-icon');
-    const value = document.getElementById('day-night-value');
-    
+    const icon = document.getElementById("day-night-icon");
+    const value = document.getElementById("day-night-value");
+
     if (icon && value) {
       if (dayPhase > 0) {
-        icon.className = 'fas fa-sun';
-        value.textContent = 'Day';
+        icon.className = "fas fa-sun";
+        value.textContent = "Day";
       } else {
-        icon.className = 'fas fa-moon';
-        value.textContent = 'Night';
+        icon.className = "fas fa-moon";
+        value.textContent = "Night";
       }
     }
   }
 }
 
+type ClickAction = "food" | "herbivore" | "carnivore" | "omnivore";
+
 class UIManager {
   private selectedOrganism: Organism | null = null;
   private settings: SimulationSettings;
   private world: World | null = null;
+  private currentAction: ClickAction = "food";
 
   setWorld(world: World): void {
     this.world = world;
+  }
+
+  getCurrentAction(): ClickAction {
+    return this.currentAction;
+  }
+
+  setCurrentAction(action: ClickAction): void {
+    this.currentAction = action;
   }
 
   constructor() {
@@ -828,7 +860,7 @@ class UIManager {
     const toggleStatsBtn = document.getElementById("toggleStatsBtn");
     const sidebarLeft = document.getElementById("sidebar-left");
     const floatingToggleLeft = document.getElementById("floatingToggleLeft");
-    
+
     const toggleLeftSidebar = () => {
       sidebarLeft?.classList.toggle("collapsed");
       const icon = toggleStatsBtn?.querySelector("i");
@@ -840,14 +872,14 @@ class UIManager {
         document.body.classList.remove("left-sidebar-collapsed");
       }
     };
-    
+
     toggleStatsBtn?.addEventListener("click", toggleLeftSidebar);
     floatingToggleLeft?.addEventListener("click", toggleLeftSidebar);
 
     const toggleInspectorBtn = document.getElementById("toggleInspectorBtn");
     const sidebarRight = document.getElementById("sidebar-right");
     const floatingToggleRight = document.getElementById("floatingToggleRight");
-    
+
     const toggleRightSidebar = () => {
       sidebarRight?.classList.toggle("collapsed");
       const icon = toggleInspectorBtn?.querySelector("i");
@@ -859,7 +891,7 @@ class UIManager {
         document.body.classList.remove("right-sidebar-collapsed");
       }
     };
-    
+
     toggleInspectorBtn?.addEventListener("click", toggleRightSidebar);
     floatingToggleRight?.addEventListener("click", toggleRightSidebar);
 
@@ -871,6 +903,23 @@ class UIManager {
         if (valueSpan) {
           valueSpan.textContent = target.value;
         }
+      });
+    });
+
+    // Action selector buttons
+    document.querySelectorAll(".action-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        // Remove active class from all buttons
+        document
+          .querySelectorAll(".action-btn")
+          .forEach((b) => b.classList.remove("active"));
+        
+        // Add active class to clicked button
+        btn.classList.add("active");
+        
+        // Set current action
+        const action = btn.getAttribute("data-action") as ClickAction;
+        this.currentAction = action;
       });
     });
   }
@@ -1155,6 +1204,7 @@ class World {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
     this.ui = new UIManager();
+    this.ui.setWorld(this);
     this.enhancedStatsManager = new EnhancedStatsManager();
     this.startTime = Date.now();
 
@@ -1237,15 +1287,33 @@ class World {
   }
 
   setupEventListeners(): void {
-    // Click to add food
+    // Click to add items based on current action
     this.canvas.addEventListener("click", (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
       if (!this.isPointInObstacle(x, y)) {
-        this.food.push(new Food(x, y));
-        this.createParticleEffect(x, y, "#00ff00", "food_spawn");
+        const action = this.ui.getCurrentAction();
+        
+        switch (action) {
+          case "food":
+            this.food.push(new Food(x, y));
+            this.createParticleEffect(x, y, "#00ff00", "food_spawn");
+            break;
+          case "herbivore":
+            this.organisms.push(new Organism(x, y, SpeciesType.HERBIVORE));
+            this.createParticleEffect(x, y, "#4CAF50", "birth");
+            break;
+          case "carnivore":
+            this.organisms.push(new Organism(x, y, SpeciesType.CARNIVORE));
+            this.createParticleEffect(x, y, "#F44336", "birth");
+            break;
+          case "omnivore":
+            this.organisms.push(new Organism(x, y, SpeciesType.OMNIVORE));
+            this.createParticleEffect(x, y, "#FF9800", "birth");
+            break;
+        }
       }
     });
 
@@ -1268,8 +1336,41 @@ class World {
         case "4":
           this.speed = 4;
           break;
+        case "f":
+        case "F":
+          this.ui.setCurrentAction("food");
+          this.updateActionButtons("food");
+          break;
+        case "h":
+        case "H":
+          this.ui.setCurrentAction("herbivore");
+          this.updateActionButtons("herbivore");
+          break;
+        case "c":
+        case "C":
+          this.ui.setCurrentAction("carnivore");
+          this.updateActionButtons("carnivore");
+          break;
+        case "o":
+        case "O":
+          this.ui.setCurrentAction("omnivore");
+          this.updateActionButtons("omnivore");
+          break;
       }
     });
+  }
+
+  updateActionButtons(action: ClickAction): void {
+    // Remove active class from all buttons
+    document
+      .querySelectorAll(".action-btn")
+      .forEach((b) => b.classList.remove("active"));
+    
+    // Add active class to the correct button
+    const targetBtn = document.querySelector(`[data-action="${action}"]`);
+    if (targetBtn) {
+      targetBtn.classList.add("active");
+    }
   }
 
   createParticleEffect(
@@ -1463,12 +1564,16 @@ class World {
     // Update statistics
     this.updateStats();
     this.stats.generationTime = Date.now() - this.startTime;
-    
+
     // Update UI with new stats
     this.ui.updateStats(this.stats);
-    
+
     // Update enhanced stats panel
-    this.enhancedStatsManager.updateEnhancedStats(this.organisms, this.food, this);
+    this.enhancedStatsManager.updateEnhancedStats(
+      this.organisms,
+      this.food,
+      this
+    );
   }
 
   getDayNightColor(): string {
@@ -1522,7 +1627,6 @@ class World {
     for (const organism of this.organisms) {
       organism.draw(this.ctx);
     }
-
   }
 
   reset(): void {
@@ -1550,22 +1654,19 @@ class World {
   }
 }
 
-let world: World;
-
 function main(): void {
   console.log("=== Primordial Soup Debug ===");
   console.log("Sidebar left:", document.getElementById("sidebar-left"));
   console.log("Sidebar right:", document.getElementById("sidebar-right"));
   console.log("Navbar:", document.getElementById("navbar"));
-  
+
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
   if (!canvas) {
     console.error("Canvas element not found!");
     return;
   }
 
-  world = new World(canvas);
-  world.ui.setWorld(world);
+  const world = new World(canvas);
 
   function animate(): void {
     world.update();
