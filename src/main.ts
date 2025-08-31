@@ -1,6 +1,3 @@
-// Advanced Primordial Soup Simulation
-// Multiple species, genetics, AI, reproduction, and environmental interactions
-
 // Genetic traits that define organism characteristics
 interface DNA {
   speed: number; // Movement speed multiplier
@@ -516,6 +513,611 @@ interface Stats {
   foodCount: number;
   reproductionEvents: number;
   deathEvents: number;
+  generationTime: number;
+}
+
+interface EnhancedStats extends Stats {
+  geneticDiversity: number;
+  selectionPressure: number;
+  adaptationRate: number;
+  predationRate: number;
+  foodScarcity: number;
+  dayNightPhase: number;
+  fps: number;
+  populationTrend: 'up' | 'down' | 'stable';
+  foodTrend: 'up' | 'down' | 'stable';
+}
+
+interface SimulationSettings {
+  foodSpawnRate: number;
+  maxFood: number;
+  initialHerbivores: number;
+  initialCarnivores: number;
+  initialOmnivores: number;
+  showTrails: boolean;
+  showParticles: boolean;
+  dayNightCycle: boolean;
+}
+
+class EnhancedStatsManager {
+  private previousStats: EnhancedStats | null = null;
+  private tooltip: HTMLElement;
+  private fpsCounter: number[] = [];
+  private lastFrameTime: number = 0;
+
+  constructor() {
+    this.tooltip = document.getElementById('statsTooltip') || document.createElement('div');
+    setTimeout(() => this.setupEventListeners(), 100); // Defer setup to ensure DOM is ready
+  }
+
+  setupEventListeners(): void {
+    // Simplified setup for basic stats panel
+    // Future: Add click handlers for expanding/collapsing stats
+  }
+
+  showTooltip(event: MouseEvent, text: string): void {
+    this.tooltip.textContent = text;
+    this.tooltip.classList.add('visible');
+    this.updateTooltipPosition(event);
+  }
+
+  hideTooltip(): void {
+    this.tooltip.classList.remove('visible');
+  }
+
+  updateTooltipPosition(event: MouseEvent): void {
+    const rect = this.tooltip.getBoundingClientRect();
+    let x = event.clientX + 10;
+    let y = event.clientY - rect.height - 10;
+
+    if (x + rect.width > window.innerWidth) {
+      x = event.clientX - rect.width - 10;
+    }
+    if (y < 0) {
+      y = event.clientY + 10;
+    }
+
+    this.tooltip.style.left = x + 'px';
+    this.tooltip.style.top = y + 'px';
+  }
+
+  calculateGeneticDiversity(organisms: Organism[]): number {
+    if (organisms.length === 0) return 0;
+
+    const traits = ['speed', 'efficiency', 'aggression', 'size', 'socialness'];
+    let totalVariance = 0;
+
+    for (const trait of traits) {
+      const values = organisms.map(org => (org.dna as any)[trait]);
+      const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+      const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+      totalVariance += variance;
+    }
+
+    return Math.min(100, (totalVariance / traits.length) * 100);
+  }
+
+  calculateSelectionPressure(organisms: Organism[], food: Food[]): number {
+    if (organisms.length === 0) return 0;
+    
+    const foodPerOrganism = food.length / organisms.length;
+    const avgEnergy = organisms.reduce((sum, org) => sum + org.energy, 0) / organisms.length;
+    const maxPossibleEnergy = organisms.reduce((sum, org) => sum + org.maxEnergy, 0) / organisms.length;
+    
+    const energyRatio = avgEnergy / maxPossibleEnergy;
+    const foodPressure = Math.max(0, 1 - foodPerOrganism / 2);
+    
+    return Math.min(100, (foodPressure + (1 - energyRatio)) * 50);
+  }
+
+  calculatePredationRate(organisms: Organism[]): number {
+    const carnivores = organisms.filter(org => org.species === SpeciesType.CARNIVORE).length;
+    const aggressiveOmnivores = organisms.filter(org => 
+      org.species === SpeciesType.OMNIVORE && org.dna.aggression > 0.6
+    ).length;
+    const totalPredators = carnivores + aggressiveOmnivores;
+    const totalPrey = organisms.filter(org => org.species === SpeciesType.HERBIVORE).length;
+    
+    if (totalPrey === 0) return 0;
+    return Math.min(100, (totalPredators / totalPrey) * 100);
+  }
+
+  calculateFoodScarcity(organisms: Organism[], food: Food[]): number {
+    if (organisms.length === 0) return 0;
+    const foodPerOrganism = food.length / organisms.length;
+    return Math.max(0, Math.min(100, (1 - foodPerOrganism / 3) * 100));
+  }
+
+  calculateFPS(): number {
+    const now = performance.now();
+    if (this.lastFrameTime > 0) {
+      const frameDelta = now - this.lastFrameTime;
+      this.fpsCounter.push(1000 / frameDelta);
+      if (this.fpsCounter.length > 60) {
+        this.fpsCounter.shift();
+      }
+    }
+    this.lastFrameTime = now;
+    
+    if (this.fpsCounter.length === 0) return 60;
+    return Math.round(this.fpsCounter.reduce((sum, fps) => sum + fps, 0) / this.fpsCounter.length);
+  }
+
+  getTrend(current: number, previous: number | undefined): 'up' | 'down' | 'stable' {
+    if (previous === undefined) return 'stable';
+    const diff = current - previous;
+    const threshold = Math.abs(previous) * 0.05; // 5% threshold
+    
+    if (Math.abs(diff) < threshold) return 'stable';
+    return diff > 0 ? 'up' : 'down';
+  }
+
+  updateEnhancedStats(organisms: Organism[], food: Food[], world: World): void {
+    const basicStats = world.stats;
+    
+    const enhancedStats: EnhancedStats = {
+      ...basicStats,
+      geneticDiversity: this.calculateGeneticDiversity(organisms),
+      selectionPressure: this.calculateSelectionPressure(organisms, food),
+      adaptationRate: Math.random() * 100, // Placeholder - would need historical genetic data
+      predationRate: this.calculatePredationRate(organisms),
+      foodScarcity: this.calculateFoodScarcity(organisms, food),
+      dayNightPhase: (world.time % 7200) / 7200,
+      fps: this.calculateFPS(),
+      populationTrend: this.getTrend(basicStats.totalPopulation, this.previousStats?.totalPopulation),
+      foodTrend: this.getTrend(basicStats.foodCount, this.previousStats?.foodCount)
+    };
+
+    this.updateUI(enhancedStats, world);
+    this.previousStats = enhancedStats;
+  }
+
+  updateUI(stats: EnhancedStats, world: World): void {
+    // Update population count in sidebar
+    this.updateElement('pop-count', stats.totalPopulation.toString());
+  }
+
+  updateElement(id: string, value: string): void {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+
+  updateTrend(id: string, trend: 'up' | 'down' | 'stable'): void {
+    const element = document.getElementById(id);
+    if (element) {
+      element.className = `trend-indicator ${trend}`;
+    }
+  }
+
+  updateHealthIndicator(id: string, value: number): void {
+    const element = document.getElementById(id);
+    if (element) {
+      element.className = `health-indicator ${this.getHealthClass(value)}`;
+    }
+  }
+
+  getHealthClass(value: number): string {
+    if (value >= 70) return 'good';
+    if (value >= 40) return 'warning';
+    return 'danger';
+  }
+
+  getPressureLabel(value: number): string {
+    if (value >= 70) return 'High';
+    if (value >= 40) return 'Medium';
+    return 'Low';
+  }
+
+  getScarcityLabel(value: number): string {
+    if (value >= 70) return 'High';
+    if (value >= 40) return 'Medium';
+    return 'Low';
+  }
+
+  updateDayNight(phase: number): void {
+    const dayPhase = Math.sin(phase * Math.PI * 2);
+    const icon = document.getElementById('day-night-icon');
+    const value = document.getElementById('day-night-value');
+    
+    if (icon && value) {
+      if (dayPhase > 0) {
+        icon.className = 'fas fa-sun';
+        value.textContent = 'Day';
+      } else {
+        icon.className = 'fas fa-moon';
+        value.textContent = 'Night';
+      }
+    }
+  }
+}
+
+class UIManager {
+  private selectedOrganism: Organism | null = null;
+  private settings: SimulationSettings;
+  private world: World | null = null;
+
+  setWorld(world: World): void {
+    this.world = world;
+  }
+
+  constructor() {
+    this.settings = {
+      foodSpawnRate: 50,
+      maxFood: 100,
+      initialHerbivores: 25,
+      initialCarnivores: 10,
+      initialOmnivores: 15,
+      showTrails: true,
+      showParticles: true,
+      dayNightCycle: true,
+    };
+    this.setupEventListeners();
+  }
+
+  private setupEventListeners(): void {
+    // Play/Pause button
+    const playPauseBtn = document.getElementById(
+      "playPauseBtn"
+    ) as HTMLButtonElement;
+    playPauseBtn?.addEventListener("click", () => {
+      const icon = playPauseBtn.querySelector("i");
+      if (!this.world) return;
+      if (this.world.paused) {
+        this.world.paused = false;
+        icon?.classList.replace("fa-play", "fa-pause");
+      } else {
+        this.world.paused = true;
+        icon?.classList.replace("fa-pause", "fa-play");
+      }
+    });
+
+    // Speed controls
+    document.querySelectorAll(".speed-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document
+          .querySelectorAll(".speed-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        if (this.world) {
+          this.world.speed = parseFloat(btn.getAttribute("data-speed") || "1");
+        }
+      });
+    });
+
+    // Reset button
+    const resetBtn = document.getElementById("resetBtn");
+    resetBtn?.addEventListener("click", () => {
+      this.world?.reset();
+    });
+
+    // Settings button
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsModal = document.getElementById("settingsModal");
+    settingsBtn?.addEventListener("click", () => {
+      settingsModal?.classList.add("active");
+      this.populateSettings();
+    });
+
+    // Close modal
+    const closeBtn = settingsModal?.querySelector(".close-btn");
+    closeBtn?.addEventListener("click", () => {
+      settingsModal?.classList.remove("active");
+    });
+
+    // Click outside modal to close
+    settingsModal?.addEventListener("click", (e) => {
+      if (e.target === settingsModal) {
+        settingsModal.classList.remove("active");
+      }
+    });
+
+    // Apply settings
+    const applyBtn = document.getElementById("applySettings");
+    applyBtn?.addEventListener("click", () => {
+      this.applySettings();
+      settingsModal?.classList.remove("active");
+    });
+
+    // Reset settings
+    const resetSettingsBtn = document.getElementById("resetSettings");
+    resetSettingsBtn?.addEventListener("click", () => {
+      this.resetSettings();
+    });
+
+    // Sidebar toggles
+    const toggleStatsBtn = document.getElementById("toggleStatsBtn");
+    const sidebarLeft = document.getElementById("sidebar-left");
+    const floatingToggleLeft = document.getElementById("floatingToggleLeft");
+    
+    const toggleLeftSidebar = () => {
+      sidebarLeft?.classList.toggle("collapsed");
+      const icon = toggleStatsBtn?.querySelector("i");
+      if (sidebarLeft?.classList.contains("collapsed")) {
+        icon?.classList.replace("fa-chevron-left", "fa-chevron-right");
+        document.body.classList.add("left-sidebar-collapsed");
+      } else {
+        icon?.classList.replace("fa-chevron-right", "fa-chevron-left");
+        document.body.classList.remove("left-sidebar-collapsed");
+      }
+    };
+    
+    toggleStatsBtn?.addEventListener("click", toggleLeftSidebar);
+    floatingToggleLeft?.addEventListener("click", toggleLeftSidebar);
+
+    const toggleInspectorBtn = document.getElementById("toggleInspectorBtn");
+    const sidebarRight = document.getElementById("sidebar-right");
+    const floatingToggleRight = document.getElementById("floatingToggleRight");
+    
+    const toggleRightSidebar = () => {
+      sidebarRight?.classList.toggle("collapsed");
+      const icon = toggleInspectorBtn?.querySelector("i");
+      if (sidebarRight?.classList.contains("collapsed")) {
+        icon?.classList.replace("fa-chevron-right", "fa-chevron-left");
+        document.body.classList.add("right-sidebar-collapsed");
+      } else {
+        icon?.classList.replace("fa-chevron-left", "fa-chevron-right");
+        document.body.classList.remove("right-sidebar-collapsed");
+      }
+    };
+    
+    toggleInspectorBtn?.addEventListener("click", toggleRightSidebar);
+    floatingToggleRight?.addEventListener("click", toggleRightSidebar);
+
+    // Range input updates
+    document.querySelectorAll('input[type="range"]').forEach((input) => {
+      input.addEventListener("input", (e) => {
+        const target = e.target as HTMLInputElement;
+        const valueSpan = target.parentElement?.querySelector(".setting-value");
+        if (valueSpan) {
+          valueSpan.textContent = target.value;
+        }
+      });
+    });
+  }
+
+  private populateSettings(): void {
+    (document.getElementById("foodSpawnRate") as HTMLInputElement).value =
+      this.settings.foodSpawnRate.toString();
+    (document.getElementById("maxFood") as HTMLInputElement).value =
+      this.settings.maxFood.toString();
+    (document.getElementById("initialHerbivores") as HTMLInputElement).value =
+      this.settings.initialHerbivores.toString();
+    (document.getElementById("initialCarnivores") as HTMLInputElement).value =
+      this.settings.initialCarnivores.toString();
+    (document.getElementById("initialOmnivores") as HTMLInputElement).value =
+      this.settings.initialOmnivores.toString();
+    (document.getElementById("showTrails") as HTMLInputElement).checked =
+      this.settings.showTrails;
+    (document.getElementById("showParticles") as HTMLInputElement).checked =
+      this.settings.showParticles;
+    (document.getElementById("dayNightCycle") as HTMLInputElement).checked =
+      this.settings.dayNightCycle;
+
+    // Update value displays
+    document.querySelectorAll('input[type="range"]').forEach((input) => {
+      const target = input as HTMLInputElement;
+      const valueSpan = target.parentElement?.querySelector(".setting-value");
+      if (valueSpan) {
+        valueSpan.textContent = target.value;
+      }
+    });
+  }
+
+  private applySettings(): void {
+    this.settings.foodSpawnRate = parseInt(
+      (document.getElementById("foodSpawnRate") as HTMLInputElement).value
+    );
+    this.settings.maxFood = parseInt(
+      (document.getElementById("maxFood") as HTMLInputElement).value
+    );
+    this.settings.initialHerbivores = parseInt(
+      (document.getElementById("initialHerbivores") as HTMLInputElement).value
+    );
+    this.settings.initialCarnivores = parseInt(
+      (document.getElementById("initialCarnivores") as HTMLInputElement).value
+    );
+    this.settings.initialOmnivores = parseInt(
+      (document.getElementById("initialOmnivores") as HTMLInputElement).value
+    );
+    this.settings.showTrails = (
+      document.getElementById("showTrails") as HTMLInputElement
+    ).checked;
+    this.settings.showParticles = (
+      document.getElementById("showParticles") as HTMLInputElement
+    ).checked;
+    this.settings.dayNightCycle = (
+      document.getElementById("dayNightCycle") as HTMLInputElement
+    ).checked;
+
+    this.world?.applySettings(this.settings);
+  }
+
+  private resetSettings(): void {
+    this.settings = {
+      foodSpawnRate: 50,
+      maxFood: 100,
+      initialHerbivores: 25,
+      initialCarnivores: 10,
+      initialOmnivores: 15,
+      showTrails: true,
+      showParticles: true,
+      dayNightCycle: true,
+    };
+    this.populateSettings();
+  }
+
+  updateStats(stats: Stats): void {
+    document.getElementById("herbivoreCount")!.textContent =
+      stats.herbivoreCount.toString();
+    document.getElementById("carnivoreCount")!.textContent =
+      stats.carnivoreCount.toString();
+    document.getElementById("omnivoreCount")!.textContent =
+      stats.omnivoreCount.toString();
+    document.getElementById("totalPopulation")!.textContent =
+      stats.totalPopulation.toString();
+    document.getElementById("foodCount")!.textContent =
+      stats.foodCount.toString();
+    document.getElementById("averageAge")!.textContent = Math.floor(
+      stats.averageAge
+    ).toString();
+    document.getElementById("averageEnergy")!.textContent = Math.floor(
+      stats.averageEnergy
+    ).toString();
+    document.getElementById("birthCount")!.textContent =
+      stats.reproductionEvents.toString();
+    document.getElementById("deathCount")!.textContent =
+      stats.deathEvents.toString();
+    document.getElementById("generationTime")!.textContent =
+      Math.floor(stats.generationTime / 60).toString() + "s";
+  }
+
+  selectOrganism(organism: Organism | null): void {
+    this.selectedOrganism = organism;
+    this.updateInspector();
+  }
+
+  private updateInspector(): void {
+    const inspectorContent = document.getElementById("inspectorContent");
+    if (!inspectorContent) return;
+
+    if (!this.selectedOrganism) {
+      inspectorContent.innerHTML = `
+        <div class="inspector-placeholder">
+          <i class="fas fa-mouse-pointer"></i>
+          <p>Click on an organism to inspect its genetics and behavior</p>
+        </div>
+      `;
+      return;
+    }
+
+    const organism = this.selectedOrganism;
+    const healthPercentage = (organism.energy / organism.maxEnergy) * 100;
+    const agePercentage = (organism.age / organism.dna.lifespan) * 100;
+
+    inspectorContent.innerHTML = `
+      <div class="organism-details">
+        <div class="organism-header">
+          <div class="organism-icon">
+            <div class="pop-color ${organism.species}"></div>
+          </div>
+          <div class="organism-info">
+            <h4>${
+              organism.species.charAt(0).toUpperCase() +
+              organism.species.slice(1)
+            }</h4>
+            <p>Age: ${organism.age} / ${organism.dna.lifespan}</p>
+          </div>
+        </div>
+        
+        <div class="health-bar">
+          <label>Energy: ${Math.floor(organism.energy)}/${
+      organism.maxEnergy
+    }</label>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${healthPercentage}%; background: ${
+      healthPercentage > 50
+        ? "#4CAF50"
+        : healthPercentage > 25
+        ? "#FF9800"
+        : "#F44336"
+    }"></div>
+          </div>
+        </div>
+        
+        <div class="age-bar">
+          <label>Lifespan Progress</label>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${agePercentage}%; background: #00d4aa"></div>
+          </div>
+        </div>
+        
+        <div class="genetics-section">
+          <h5><i class="fas fa-dna"></i> Genetics</h5>
+          <div class="gene-grid">
+            <div class="gene-item">
+              <span class="gene-label">Speed</span>
+              <div class="gene-bar">
+                <div class="gene-fill" style="width: ${
+                  (organism.dna.speed / 2) * 100
+                }%"></div>
+              </div>
+              <span class="gene-value">${organism.dna.speed.toFixed(2)}</span>
+            </div>
+            <div class="gene-item">
+              <span class="gene-label">Efficiency</span>
+              <div class="gene-bar">
+                <div class="gene-fill" style="width: ${
+                  (organism.dna.efficiency / 2) * 100
+                }%"></div>
+              </div>
+              <span class="gene-value">${organism.dna.efficiency.toFixed(
+                2
+              )}</span>
+            </div>
+            <div class="gene-item">
+              <span class="gene-label">Aggression</span>
+              <div class="gene-bar">
+                <div class="gene-fill" style="width: ${
+                  organism.dna.aggression * 100
+                }%"></div>
+              </div>
+              <span class="gene-value">${organism.dna.aggression.toFixed(
+                2
+              )}</span>
+            </div>
+            <div class="gene-item">
+              <span class="gene-label">Size</span>
+              <div class="gene-bar">
+                <div class="gene-fill" style="width: ${
+                  ((organism.dna.size - 0.5) / 1) * 100
+                }%"></div>
+              </div>
+              <span class="gene-value">${organism.dna.size.toFixed(2)}</span>
+            </div>
+            <div class="gene-item">
+              <span class="gene-label">Socialness</span>
+              <div class="gene-bar">
+                <div class="gene-fill" style="width: ${
+                  organism.dna.socialness * 100
+                }%"></div>
+              </div>
+              <span class="gene-value">${organism.dna.socialness.toFixed(
+                2
+              )}</span>
+            </div>
+            <div class="gene-item">
+              <span class="gene-label">Reproduction</span>
+              <div class="gene-bar">
+                <div class="gene-fill" style="width: ${
+                  ((organism.dna.reproductionThreshold - 40) / 80) * 100
+                }%"></div>
+              </div>
+              <span class="gene-value">${Math.floor(
+                organism.dna.reproductionThreshold
+              )}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="behavior-section">
+          <h5><i class="fas fa-brain"></i> Current Behavior</h5>
+          <div class="behavior-info">
+            <p><strong>Target:</strong> ${
+              organism.targetX ? "Hunting/Foraging" : "Wandering"
+            }</p>
+            <p><strong>Can Reproduce:</strong> ${
+              organism.canReproduce() ? "Yes" : "No"
+            }</p>
+            <p><strong>Cooldown:</strong> ${organism.reproductionCooldown}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  getSettings(): SimulationSettings {
+    return this.settings;
+  }
 }
 
 class World {
@@ -525,12 +1127,15 @@ class World {
   food: Food[] = [];
   obstacles: Obstacle[] = [];
   particles: Particle[] = [];
+  ui: UIManager;
+  enhancedStatsManager: EnhancedStatsManager;
 
   // Simulation state
   foodSpawnTimer: number = 0;
   time: number = 0;
   paused: boolean = false;
   speed: number = 1;
+  startTime: number = 0;
 
   // Statistics
   stats: Stats = {
@@ -543,11 +1148,15 @@ class World {
     foodCount: 0,
     reproductionEvents: 0,
     deathEvents: 0,
+    generationTime: 0,
   };
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d")!;
+    this.ui = new UIManager();
+    this.enhancedStatsManager = new EnhancedStatsManager();
+    this.startTime = Date.now();
 
     this.resizeCanvas();
     window.addEventListener("resize", () => this.resizeCanvas());
@@ -853,6 +1462,13 @@ class World {
 
     // Update statistics
     this.updateStats();
+    this.stats.generationTime = Date.now() - this.startTime;
+    
+    // Update UI with new stats
+    this.ui.updateStats(this.stats);
+    
+    // Update enhanced stats panel
+    this.enhancedStatsManager.updateEnhancedStats(this.organisms, this.food, this);
   }
 
   getDayNightColor(): string {
@@ -907,101 +1523,49 @@ class World {
       organism.draw(this.ctx);
     }
 
-    // Draw UI
-    this.drawUI();
   }
 
-  drawUI(): void {
-    const padding = 15;
-    const lineHeight = 18;
-    let y = padding;
+  reset(): void {
+    this.organisms = [];
+    this.food = [];
+    this.particles = [];
+    this.stats.reproductionEvents = 0;
+    this.stats.deathEvents = 0;
+    this.startTime = Date.now();
+    this.time = 0;
+    this.ui.selectOrganism(null);
 
-    // Semi-transparent background
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    this.ctx.fillRect(5, 5, 300, 200);
+    // Recreate initial population
+    this.setupInitialPopulation();
+    this.spawnFood(40);
+  }
 
-    // Text styling
-    this.ctx.fillStyle = "#ffffff";
-    this.ctx.font = "14px monospace";
-
-    // Population stats
-    this.ctx.fillText(
-      `Population: ${this.stats.totalPopulation}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillStyle = "#4CAF50";
-    this.ctx.fillText(
-      `  Herbivores: ${this.stats.herbivoreCount}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillStyle = "#FF9800";
-    this.ctx.fillText(
-      `  Omnivores: ${this.stats.omnivoreCount}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillStyle = "#F44336";
-    this.ctx.fillText(
-      `  Carnivores: ${this.stats.carnivoreCount}`,
-      padding,
-      (y += lineHeight)
-    );
-
-    // Other stats
-    this.ctx.fillStyle = "#ffffff";
-    this.ctx.fillText(
-      `Food: ${this.stats.foodCount}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillText(
-      `Avg Age: ${Math.floor(this.stats.averageAge)}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillText(
-      `Avg Energy: ${Math.floor(this.stats.averageEnergy)}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillText(
-      `Births: ${this.stats.reproductionEvents}`,
-      padding,
-      (y += lineHeight)
-    );
-    this.ctx.fillText(
-      `Deaths: ${this.stats.deathEvents}`,
-      padding,
-      (y += lineHeight)
-    );
-
-    // Controls
-    this.ctx.fillStyle = "#cccccc";
-    this.ctx.font = "12px monospace";
-    this.ctx.fillText(
-      `Speed: ${this.speed}x ${this.paused ? "(PAUSED)" : ""}`,
-      padding,
-      (y += lineHeight + 5)
-    );
-    this.ctx.fillText(
-      "Controls: SPACE=pause, 1-4=speed, click=add food",
-      padding,
-      (y += lineHeight)
-    );
+  applySettings(settings: SimulationSettings): void {
+    // Apply new settings by updating simulation parameters
+    const maxFood = document.getElementById("maxFood") as HTMLInputElement;
+    if (maxFood) {
+      // Update food spawn parameters based on settings
+      this.spawnFood(Math.min(settings.maxFood - this.food.length, 20));
+    }
   }
 }
 
-// Initialize the advanced simulation
+let world: World;
+
 function main(): void {
+  console.log("=== Primordial Soup Debug ===");
+  console.log("Sidebar left:", document.getElementById("sidebar-left"));
+  console.log("Sidebar right:", document.getElementById("sidebar-right"));
+  console.log("Navbar:", document.getElementById("navbar"));
+  
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
   if (!canvas) {
     console.error("Canvas element not found!");
     return;
   }
 
-  const world = new World(canvas);
+  world = new World(canvas);
+  world.ui.setWorld(world);
 
   function animate(): void {
     world.update();

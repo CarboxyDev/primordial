@@ -4,10 +4,263 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Primordial Soup Simulation</title>
+    <title>Primordial Soup - Evolution Simulator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/src/override.css" rel="stylesheet">
   </head>
   <body>
+    <!-- Main Canvas -->
     <canvas id="canvas"></canvas>
+
+    
+
+    <!-- Left Sidebar - Statistics Dashboard -->
+    <aside id="sidebar-left" class="sidebar">
+      <div class="sidebar-header">
+        <h3><i class="fas fa-chart-bar"></i> Control Panel</h3>
+        <button id="toggleStatsBtn" class="toggle-btn">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <div class="sidebar-content">
+        <!-- Stats Section at Top -->
+        <div class="stats-container">
+          <!-- Quick Population Counter -->
+          <div class="stat-section">
+            <h4><i class="fas fa-chart-line"></i>Live Stats</h4>
+            <div class="quick-stats">
+              <div class="quick-stat">
+                <span class="quick-label">Total Population:</span>
+                <span id="pop-count" class="quick-value">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Population Stats -->
+          <div class="stat-section">
+            <h4><i class="fas fa-users"></i>Population Details</h4>
+            <div class="population-grid">
+              <div class="pop-item">
+                <div class="pop-color herbivore"></div>
+                <span class="pop-label">Herbivores</span>
+                <span id="herbivoreCount" class="pop-count">0</span>
+              </div>
+              <div class="pop-item">
+                <div class="pop-color carnivore"></div>
+                <span class="pop-label">Carnivores</span>
+                <span id="carnivoreCount" class="pop-count">0</span>
+              </div>
+              <div class="pop-item">
+                <div class="pop-color omnivore"></div>
+                <span class="pop-label">Omnivores</span>
+                <span id="omnivoreCount" class="pop-count">0</span>
+              </div>
+              <div class="pop-item total">
+                <i class="fas fa-users"></i>
+                <span class="pop-label">Total</span>
+                <span id="totalPopulation" class="pop-count">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Environment Stats -->
+          <div class="stat-section">
+            <h4><i class="fas fa-leaf"></i>Environment</h4>
+            <div class="stat-grid">
+              <div class="stat-item">
+                <i class="fas fa-apple-alt"></i>
+                <div>
+                  <span class="stat-label">Food</span>
+                  <span id="foodCount" class="stat-value">0</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                  <span class="stat-label">Generation Time</span>
+                  <span id="generationTime" class="stat-value">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Life Stats -->
+          <div class="stat-section">
+            <h4><i class="fas fa-heartbeat"></i>Life Cycle</h4>
+            <div class="stat-grid">
+              <div class="stat-item">
+                <i class="fas fa-birthday-cake"></i>
+                <div>
+                  <span class="stat-label">Avg Age</span>
+                  <span id="averageAge" class="stat-value">0</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-battery-half"></i>
+                <div>
+                  <span class="stat-label">Avg Energy</span>
+                  <span id="averageEnergy" class="stat-value">0</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-heart"></i>
+                <div>
+                  <span class="stat-label">Births</span>
+                  <span id="birthCount" class="stat-value">0</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-skull"></i>
+                <div>
+                  <span class="stat-label">Deaths</span>
+                  <span id="deathCount" class="stat-value">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Section at Bottom -->
+        <div class="controls-container">
+          <!-- Speed Controls Section -->
+          <div class="stat-section">
+            <h4><i class="fas fa-tachometer-alt"></i>Simulation Speed</h4>
+            <div class="speed-controls-grid">
+              <button class="speed-btn" data-speed="0.5">0.5x</button>
+              <button class="speed-btn active" data-speed="1">1x</button>
+              <button class="speed-btn" data-speed="2">2x</button>
+              <button class="speed-btn" data-speed="4">4x</button>
+            </div>
+          </div>
+
+          <!-- Control Section -->
+          <div class="stat-section">
+            <h4><i class="fas fa-gamepad"></i>Controls</h4>
+            <div class="control-grid">
+              <button id="playPauseBtn" class="btn btn-primary control-btn">
+                <i class="fas fa-pause"></i> Pause
+              </button>
+              <button id="resetBtn" class="btn btn-secondary control-btn">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+              <button id="settingsBtn" class="btn btn-secondary control-btn">
+                <i class="fas fa-cog"></i> Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Sidebar - Organism Inspector -->
+    <aside id="sidebar-right" class="sidebar right">
+      <div class="sidebar-header">
+        <h3><i class="fas fa-search"></i> Inspector</h3>
+        <button id="toggleInspectorBtn" class="toggle-btn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      
+      <div class="sidebar-content">
+        <div id="inspectorContent">
+          <div class="inspector-placeholder">
+            <i class="fas fa-mouse-pointer"></i>
+            <p>Click on an organism to inspect its genetics and behavior</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2><i class="fas fa-cog"></i> Simulation Settings</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-grid">
+            <!-- Environment Settings -->
+            <div class="settings-section">
+              <h3>Environment</h3>
+              <div class="setting-item">
+                <label for="foodSpawnRate">Food Spawn Rate</label>
+                <input type="range" id="foodSpawnRate" min="1" max="100" value="50">
+                <span class="setting-value">50</span>
+              </div>
+              <div class="setting-item">
+                <label for="maxFood">Max Food</label>
+                <input type="range" id="maxFood" min="50" max="300" value="100">
+                <span class="setting-value">100</span>
+              </div>
+            </div>
+
+            <!-- Population Settings -->
+            <div class="settings-section">
+              <h3>Population</h3>
+              <div class="setting-item">
+                <label for="initialHerbivores">Initial Herbivores</label>
+                <input type="range" id="initialHerbivores" min="0" max="50" value="25">
+                <span class="setting-value">25</span>
+              </div>
+              <div class="setting-item">
+                <label for="initialCarnivores">Initial Carnivores</label>
+                <input type="range" id="initialCarnivores" min="0" max="30" value="10">
+                <span class="setting-value">10</span>
+              </div>
+              <div class="setting-item">
+                <label for="initialOmnivores">Initial Omnivores</label>
+                <input type="range" id="initialOmnivores" min="0" max="30" value="15">
+                <span class="setting-value">15</span>
+              </div>
+            </div>
+
+            <!-- Visual Settings -->
+            <div class="settings-section">
+              <h3>Visual</h3>
+              <div class="setting-item">
+                <label for="showTrails">Show Trails</label>
+                <input type="checkbox" id="showTrails" checked>
+              </div>
+              <div class="setting-item">
+                <label for="showParticles">Show Particles</label>
+                <input type="checkbox" id="showParticles" checked>
+              </div>
+              <div class="setting-item">
+                <label for="dayNightCycle">Day/Night Cycle</label>
+                <input type="checkbox" id="dayNightCycle" checked>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="applySettings" class="btn btn-primary">Apply Settings</button>
+          <button id="resetSettings" class="btn btn-secondary">Reset to Defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Toggle Buttons -->
+    <div id="floatingToggleLeft" class="floating-toggle floating-toggle-left">
+      <i class="fas fa-chart-bar"></i>
+    </div>
+    
+    <div id="floatingToggleRight" class="floating-toggle floating-toggle-right">
+      <i class="fas fa-search"></i>
+    </div>
+
+    <!-- Help Tooltip -->
+    <div id="helpTooltip" class="tooltip">
+      <div class="tooltip-content">
+        <strong>Controls:</strong><br>
+        • Click: Add food<br>
+        • Space: Pause/Resume<br>
+        • 1-4: Change speed<br>
+        • Click organism: Inspect
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

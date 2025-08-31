@@ -1,0 +1,493 @@
+/* CSS Override to force sidebar visibility */
+
+/* Force sidebars to be visible and properly positioned */
+#sidebar-left {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 320px !important;
+    background: rgba(22, 27, 34, 0.95) !important;
+    border-right: 1px solid #30363d !important;
+    z-index: 900 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    color: #f0f6fc !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+#sidebar-left.collapsed {
+    transform: translateX(-100%) !important;
+}
+
+#sidebar-right {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 320px !important;
+    background: rgba(22, 27, 34, 0.95) !important;
+    border-left: 1px solid #30363d !important;
+    z-index: 900 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    color: #f0f6fc !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+#sidebar-right.collapsed {
+    transform: translateX(100%) !important;
+}
+
+
+/* Force sidebar headers */
+.sidebar-header {
+    padding: 16px 20px !important;
+    border-bottom: 1px solid #30363d !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: rgba(30, 30, 46, 0.8) !important;
+}
+
+.sidebar-header h3 {
+    color: #f0f6fc !important;
+    font-size: 16px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.sidebar-header h3 i {
+    color: #00d4aa !important;
+}
+
+/* Improved toggle buttons */
+.toggle-btn {
+    background: rgba(48, 54, 61, 0.6) !important;
+    border: 1px solid rgba(0, 212, 170, 0.3) !important;
+    color: #8b949e !important;
+    cursor: pointer !important;
+    padding: 8px 10px !important;
+    border-radius: 6px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+.toggle-btn:hover {
+    background: rgba(0, 212, 170, 0.1) !important;
+    border-color: #00d4aa !important;
+    color: #00d4aa !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 2px 8px rgba(0, 212, 170, 0.2) !important;
+}
+
+.toggle-btn:active {
+    transform: scale(0.98) !important;
+}
+
+.toggle-btn i {
+    transition: transform 0.3s ease !important;
+}
+
+/* Force sidebar content with improved layout */
+.sidebar-content {
+    flex: 1 !important;
+    padding: 0 !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Stats section at top */
+.stats-container {
+    flex: 1 !important;
+    padding: 20px !important;
+    overflow-y: auto !important;
+}
+
+/* Controls section at bottom */
+.controls-container {
+    padding: 20px !important;
+    border-top: 1px solid #30363d !important;
+    background: rgba(16, 20, 26, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* Force stat sections */
+.stat-section {
+    margin-bottom: 24px !important;
+}
+
+.stat-section h4 {
+    color: #f0f6fc !important;
+    font-size: 14px !important;
+    margin-bottom: 12px !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.stat-section h4 i {
+    color: #00d4aa !important;
+}
+
+/* Force population items */
+.pop-item {
+    display: grid !important;
+    grid-template-columns: 16px 1fr auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 8px 0 !important;
+}
+
+.pop-color {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 50% !important;
+}
+
+.pop-color.herbivore {
+    background: #4CAF50 !important;
+}
+
+.pop-color.carnivore {
+    background: #F44336 !important;
+}
+
+.pop-color.omnivore {
+    background: #FF9800 !important;
+}
+
+.pop-label {
+    color: #8b949e !important;
+    font-size: 14px !important;
+}
+
+.pop-count {
+    color: #f0f6fc !important;
+    font-weight: 600 !important;
+}
+
+/* Stat grid items */
+.stat-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+}
+
+.stat-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px !important;
+    background: rgba(48, 54, 61, 0.3) !important;
+    border-radius: 6px !important;
+}
+
+.stat-item i {
+    color: #00d4aa !important;
+    font-size: 16px !important;
+}
+
+.stat-label {
+    color: #8b949e !important;
+    font-size: 12px !important;
+    display: block !important;
+}
+
+.stat-value {
+    color: #f0f6fc !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    display: block !important;
+}
+
+/* Population grid improvements */
+.population-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.pop-item.total {
+    border-top: 1px solid #30363d !important;
+    padding-top: 12px !important;
+    margin-top: 8px !important;
+}
+
+/* Quick stats styling */
+.quick-stats {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.quick-stat {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    background: rgba(0, 212, 170, 0.1) !important;
+    border: 1px solid rgba(0, 212, 170, 0.2) !important;
+    border-radius: 8px !important;
+}
+
+.quick-label {
+    color: #8b949e !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+.quick-value {
+    color: #00d4aa !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+/* Force buttons */
+.btn {
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background: #1e1e2e !important;
+    color: #f0f6fc !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+}
+
+.btn-primary {
+    background: #00d4aa !important;
+    color: #000 !important;
+}
+
+.btn-secondary {
+    background: #21262d !important;
+    color: #f0f6fc !important;
+}
+
+/* Control grid layout */
+.control-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+.control-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+}
+
+/* Speed controls grid */
+.speed-controls-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+}
+
+.speed-btn {
+    padding: 10px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background: #21262d !important;
+    color: #8b949e !important;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s !important;
+}
+
+.speed-btn:hover {
+    background: #30363d !important;
+    color: #f0f6fc !important;
+}
+
+.speed-btn.active {
+    background: #00d4aa !important;
+    color: #000 !important;
+}
+
+/* Canvas positioning */
+#canvas {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 1 !important;
+    cursor: crosshair !important;
+}
+
+/* Additional UI improvements */
+.stat-section h4 {
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 13px !important;
+}
+
+/* Improved button animations */
+.btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3) !important;
+}
+
+.btn:active {
+    transform: translateY(0) !important;
+    transition-duration: 0.1s !important;
+}
+
+/* Speed button improvements */
+.speed-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(0, 212, 170, 0.2) !important;
+}
+
+.speed-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Scrollbar improvements */
+.sidebar-content::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+    background: rgba(48, 54, 61, 0.3) !important;
+    border-radius: 3px !important;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 170, 0.4) !important;
+    border-radius: 3px !important;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 212, 170, 0.6) !important;
+}
+
+/* Stats container styling */
+.stats-container::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.stats-container::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.stats-container::-webkit-scrollbar-thumb {
+    background: rgba(139, 148, 158, 0.3) !important;
+    border-radius: 2px !important;
+}
+
+/* Hover effects for stats */
+.stat-item:hover {
+    background: rgba(48, 54, 61, 0.5) !important;
+    border-color: rgba(0, 212, 170, 0.4) !important;
+    transform: translateY(-1px) !important;
+    transition: all 0.2s ease !important;
+}
+
+.pop-item:hover {
+    background: rgba(48, 54, 61, 0.2) !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Quick stats glow effect */
+.quick-stat:hover {
+    border-color: rgba(0, 212, 170, 0.5) !important;
+    box-shadow: 0 0 12px rgba(0, 212, 170, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Floating Toggle Buttons */
+.floating-toggle {
+    position: fixed !important;
+    top: 20px !important;
+    width: 48px !important;
+    height: 48px !important;
+    background: rgba(22, 27, 34, 0.95) !important;
+    border: 2px solid rgba(0, 212, 170, 0.3) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #8b949e !important;
+    cursor: pointer !important;
+    z-index: 1200 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+    font-size: 18px !important;
+    opacity: 0 !important;
+    transform: scale(0.8) !important;
+    pointer-events: none !important;
+}
+
+.floating-toggle-left {
+    left: 20px !important;
+}
+
+.floating-toggle-right {
+    right: 20px !important;
+}
+
+/* Show floating buttons only when sidebars are collapsed */
+body.left-sidebar-collapsed .floating-toggle-left,
+body.right-sidebar-collapsed .floating-toggle-right {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    pointer-events: all !important;
+    animation: fadeInScale 0.3s ease-out !important;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.floating-toggle:hover {
+    background: rgba(0, 212, 170, 0.1) !important;
+    border-color: #00d4aa !important;
+    color: #00d4aa !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3) !important;
+}
+
+.floating-toggle:active {
+    transform: scale(0.95) !important;
+    transition-duration: 0.1s !important;
+}
+
+.floating-toggle i {
+    transition: transform 0.2s ease !important;
+}
+
+.floating-toggle:hover i {
+    transform: scale(1.1) !important;
+}
