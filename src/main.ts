@@ -1,3 +1,6 @@
+import './style.css';
+import './override.css';
+
 // Genetic traits that define organism characteristics
 interface DNA {
   speed: number; // Movement speed multiplier
@@ -784,7 +787,7 @@ class UIManager {
 
     const icon = currentActionBtn.querySelector("i:first-child");
     const span = currentActionBtn.querySelector("span");
-    
+
     // Update button content based on selected action
     switch (action) {
       case "food":
@@ -974,7 +977,7 @@ class UIManager {
     // Action selector dropdown
     const currentActionBtn = document.getElementById("currentActionBtn");
     const actionDropdown = document.getElementById("actionDropdown");
-    
+
     // Toggle dropdown
     currentActionBtn?.addEventListener("click", () => {
       const isActive = currentActionBtn.classList.contains("active");
@@ -992,7 +995,7 @@ class UIManager {
       option.addEventListener("click", () => {
         const action = option.getAttribute("data-action") as ClickAction;
         this.selectAction(action);
-        
+
         // Close dropdown
         currentActionBtn?.classList.remove("active");
         actionDropdown?.classList.remove("active");
@@ -1001,8 +1004,10 @@ class UIManager {
 
     // Close dropdown when clicking outside
     document.addEventListener("click", (e) => {
-      if (!currentActionBtn?.contains(e.target as Node) && 
-          !actionDropdown?.contains(e.target as Node)) {
+      if (
+        !currentActionBtn?.contains(e.target as Node) &&
+        !actionDropdown?.contains(e.target as Node)
+      ) {
         currentActionBtn?.classList.remove("active");
         actionDropdown?.classList.remove("active");
       }
@@ -1081,28 +1086,25 @@ class UIManager {
   }
 
   updateStats(stats: Stats): void {
-    document.getElementById("herbivoreCount")!.textContent =
-      stats.herbivoreCount.toString();
-    document.getElementById("carnivoreCount")!.textContent =
-      stats.carnivoreCount.toString();
-    document.getElementById("omnivoreCount")!.textContent =
-      stats.omnivoreCount.toString();
-    document.getElementById("totalPopulation")!.textContent =
-      stats.totalPopulation.toString();
-    document.getElementById("foodCount")!.textContent =
-      stats.foodCount.toString();
-    document.getElementById("averageAge")!.textContent = Math.floor(
-      stats.averageAge
-    ).toString();
-    document.getElementById("averageEnergy")!.textContent = Math.floor(
-      stats.averageEnergy
-    ).toString();
-    document.getElementById("birthCount")!.textContent =
-      stats.reproductionEvents.toString();
-    document.getElementById("deathCount")!.textContent =
-      stats.deathEvents.toString();
-    document.getElementById("generationTime")!.textContent =
-      Math.floor(stats.generationTime / 60).toString() + "s";
+    this.safeUpdateElement("herbivoreCount", stats.herbivoreCount.toString());
+    this.safeUpdateElement("carnivoreCount", stats.carnivoreCount.toString());
+    this.safeUpdateElement("omnivoreCount", stats.omnivoreCount.toString());
+    this.safeUpdateElement("totalPopulation", stats.totalPopulation.toString());
+    this.safeUpdateElement("foodCount", stats.foodCount.toString());
+    this.safeUpdateElement("averageAge", Math.floor(stats.averageAge).toString());
+    this.safeUpdateElement("averageEnergy", Math.floor(stats.averageEnergy).toString());
+    this.safeUpdateElement("birthCount", stats.reproductionEvents.toString());
+    this.safeUpdateElement("deathCount", stats.deathEvents.toString());
+    this.safeUpdateElement("mutationCount", stats.reproductionEvents.toString());
+  }
+
+  private safeUpdateElement(id: string, value: string): void {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
+    } else {
+      console.warn(`Element with id '${id}' not found`);
+    }
   }
 
   selectOrganism(organism: Organism | null): void {
@@ -1380,7 +1382,7 @@ class World {
 
       if (!this.isPointInObstacle(x, y)) {
         const action = this.ui.getCurrentAction();
-        
+
         switch (action) {
           case "food":
             this.food.push(new Food(x, y));
@@ -1440,7 +1442,6 @@ class World {
       }
     });
   }
-
 
   createParticleEffect(
     x: number,
@@ -1665,6 +1666,16 @@ class World {
     // Clear canvas with day/night cycle background
     this.ctx.fillStyle = this.getDayNightColor();
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Debug logging
+    if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
+      console.log("Drawing frame:", {
+        canvasSize: `${this.canvas.width}x${this.canvas.height}`,
+        organisms: this.organisms.length,
+        food: this.food.length,
+        backgroundColor: this.getDayNightColor()
+      });
+    }
 
     // Draw obstacles
     this.ctx.fillStyle = "#444444";
@@ -1725,25 +1736,34 @@ class World {
 
 function main(): void {
   console.log("=== Primordial Soup Debug ===");
-  console.log("Sidebar left:", document.getElementById("sidebar-left"));
-  console.log("Sidebar right:", document.getElementById("sidebar-right"));
-  console.log("Navbar:", document.getElementById("navbar"));
+  console.log("DOM loaded, initializing...");
+  
+  // Add a small delay to ensure everything is ready
+  setTimeout(() => {
+    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    if (!canvas) {
+      console.error("Canvas element not found!");
+      return;
+    }
+    
+    console.log("Canvas found:", canvas);
+    console.log("Canvas client dimensions:", canvas.clientWidth, "x", canvas.clientHeight);
+    console.log("Canvas actual dimensions:", canvas.width, "x", canvas.height);
 
-  const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-  if (!canvas) {
-    console.error("Canvas element not found!");
-    return;
-  }
+    const world = new World(canvas);
+    console.log("World created, organisms count:", world.organisms.length);
+    console.log("Food count:", world.food.length);
 
-  const world = new World(canvas);
+    function animate(): void {
+      world.update();
+      world.draw();
+      requestAnimationFrame(animate);
+    }
 
-  function animate(): void {
-    world.update();
-    world.draw();
-    requestAnimationFrame(animate);
-  }
-
-  animate();
+    animate();
+    console.log("Animation loop started");
+  }, 100); // 100ms delay
 }
 
-main();
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', main);

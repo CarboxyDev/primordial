@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Primordial Soup - Evolution Simulator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/src/override.css" rel="stylesheet">
   </head>
   <body>
     <!-- Main Canvas -->
@@ -37,36 +36,30 @@
             </div>
           </div>
 
-          <!-- Population Stats -->
+          <!-- Population Stats - Compressed -->
           <div class="stat-section">
-            <h4><i class="fas fa-users"></i>Population Details</h4>
-            <div class="population-grid">
-              <div class="pop-item">
+            <div class="population-compact">
+              <div class="pop-item-compact">
                 <div class="pop-color herbivore"></div>
-                <span class="pop-label">Herbivores</span>
-                <span id="herbivoreCount" class="pop-count">0</span>
+                <span class="pop-count" id="herbivoreCount">0</span>
               </div>
-              <div class="pop-item">
+              <div class="pop-item-compact">
                 <div class="pop-color carnivore"></div>
-                <span class="pop-label">Carnivores</span>
-                <span id="carnivoreCount" class="pop-count">0</span>
+                <span class="pop-count" id="carnivoreCount">0</span>
               </div>
-              <div class="pop-item">
+              <div class="pop-item-compact">
                 <div class="pop-color omnivore"></div>
-                <span class="pop-label">Omnivores</span>
-                <span id="omnivoreCount" class="pop-count">0</span>
+                <span class="pop-count" id="omnivoreCount">0</span>
               </div>
-              <div class="pop-item total">
+              <div class="pop-item-compact total">
                 <i class="fas fa-users"></i>
-                <span class="pop-label">Total</span>
-                <span id="totalPopulation" class="pop-count">0</span>
+                <span class="pop-count" id="totalPopulation">0</span>
               </div>
             </div>
           </div>
 
-          <!-- Environment Stats -->
+          <!-- Combined Stats - No Section Labels -->
           <div class="stat-section">
-            <h4><i class="fas fa-leaf"></i>Environment</h4>
             <div class="stat-grid">
               <div class="stat-item">
                 <i class="fas fa-apple-alt"></i>
@@ -76,19 +69,12 @@
                 </div>
               </div>
               <div class="stat-item">
-                <i class="fas fa-clock"></i>
+                <i class="fas fa-dna"></i>
                 <div>
-                  <span class="stat-label">Generation Time</span>
-                  <span id="generationTime" class="stat-value">0</span>
+                  <span class="stat-label">Mutations</span>
+                  <span id="mutationCount" class="stat-value">0</span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Life Stats -->
-          <div class="stat-section">
-            <h4><i class="fas fa-heartbeat"></i>Life Cycle</h4>
-            <div class="stat-grid">
               <div class="stat-item">
                 <i class="fas fa-birthday-cake"></i>
                 <div>
@@ -123,30 +109,27 @@
 
         <!-- Controls Section at Bottom -->
         <div class="controls-container">
-          <!-- Speed Controls Section -->
+          <!-- Unified Simulation Controls -->
           <div class="stat-section">
-            <h4><i class="fas fa-tachometer-alt"></i>Simulation Speed</h4>
-            <div class="speed-controls-grid">
-              <button class="speed-btn" data-speed="0.5">0.5x</button>
-              <button class="speed-btn active" data-speed="1">1x</button>
-              <button class="speed-btn" data-speed="2">2x</button>
-              <button class="speed-btn" data-speed="4">4x</button>
-            </div>
-          </div>
-
-          <!-- Control Section -->
-          <div class="stat-section">
-            <h4><i class="fas fa-gamepad"></i>Controls</h4>
-            <div class="control-grid">
-              <button id="playPauseBtn" class="btn btn-primary control-btn">
-                <i class="fas fa-pause"></i> Pause
-              </button>
-              <button id="resetBtn" class="btn btn-secondary control-btn">
-                <i class="fas fa-undo"></i> Reset
-              </button>
-              <button id="settingsBtn" class="btn btn-secondary control-btn">
-                <i class="fas fa-cog"></i> Settings
-              </button>
+            <h4><i class="fas fa-gamepad"></i>Simulation Controls</h4>
+            <div class="unified-controls">
+              <div class="speed-controls-row">
+                <button class="speed-btn" data-speed="0.5">0.5x</button>
+                <button class="speed-btn active" data-speed="1">1x</button>
+                <button class="speed-btn" data-speed="2">2x</button>
+                <button class="speed-btn" data-speed="4">4x</button>
+              </div>
+              <div class="control-buttons">
+                <button id="playPauseBtn" class="btn btn-primary control-btn">
+                  <i class="fas fa-pause"></i> Pause
+                </button>
+                <button id="resetBtn" class="btn btn-secondary control-btn">
+                  <i class="fas fa-undo"></i> Reset
+                </button>
+                <button id="settingsBtn" class="btn btn-secondary control-btn">
+                  <i class="fas fa-cog"></i> Settings
+                </button>
+              </div>
             </div>
           </div>
 
