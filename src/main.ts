@@ -772,6 +772,71 @@ class UIManager {
     this.currentAction = action;
   }
 
+  selectAction(action: ClickAction): void {
+    this.currentAction = action;
+    this.updateCurrentActionButton(action);
+    this.updateActionOptions(action);
+  }
+
+  private updateCurrentActionButton(action: ClickAction): void {
+    const currentActionBtn = document.getElementById("currentActionBtn");
+    if (!currentActionBtn) return;
+
+    const icon = currentActionBtn.querySelector("i:first-child");
+    const span = currentActionBtn.querySelector("span");
+    
+    // Update button content based on selected action
+    switch (action) {
+      case "food":
+        if (icon) {
+          icon.className = "fas fa-apple-alt";
+        }
+        if (span) {
+          span.textContent = "Food";
+        }
+        break;
+      case "herbivore":
+        if (icon) {
+          icon.className = "creature-icon herbivore";
+          (icon as HTMLElement).style.width = "16px";
+          (icon as HTMLElement).style.height = "16px";
+        }
+        if (span) {
+          span.textContent = "Herbivore";
+        }
+        break;
+      case "carnivore":
+        if (icon) {
+          icon.className = "creature-icon carnivore";
+          (icon as HTMLElement).style.width = "16px";
+          (icon as HTMLElement).style.height = "16px";
+        }
+        if (span) {
+          span.textContent = "Carnivore";
+        }
+        break;
+      case "omnivore":
+        if (icon) {
+          icon.className = "creature-icon omnivore";
+          (icon as HTMLElement).style.width = "16px";
+          (icon as HTMLElement).style.height = "16px";
+        }
+        if (span) {
+          span.textContent = "Omnivore";
+        }
+        break;
+    }
+  }
+
+  private updateActionOptions(selectedAction: ClickAction): void {
+    document.querySelectorAll(".action-option").forEach((option) => {
+      option.classList.remove("active");
+      if (option.getAttribute("data-action") === selectedAction) {
+        option.classList.add("active");
+      }
+    });
+  }
+
   constructor() {
     this.settings = {
       foodSpawnRate: 50,
@@ -906,21 +971,41 @@ class UIManager {
       });
     });
 
-    // Action selector buttons
-    document.querySelectorAll(".action-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        // Remove active class from all buttons
-        document
-          .querySelectorAll(".action-btn")
-          .forEach((b) => b.classList.remove("active"));
+    // Action selector dropdown
+    const currentActionBtn = document.getElementById("currentActionBtn");
+    const actionDropdown = document.getElementById("actionDropdown");
+    
+    // Toggle dropdown
+    currentActionBtn?.addEventListener("click", () => {
+      const isActive = currentActionBtn.classList.contains("active");
+      if (isActive) {
+        currentActionBtn.classList.remove("active");
+        actionDropdown?.classList.remove("active");
+      } else {
+        currentActionBtn.classList.add("active");
+        actionDropdown?.classList.add("active");
+      }
+    });
+
+    // Handle action selection
+    document.querySelectorAll(".action-option").forEach((option) => {
+      option.addEventListener("click", () => {
+        const action = option.getAttribute("data-action") as ClickAction;
+        this.selectAction(action);
         
-        // Add active class to clicked button
-        btn.classList.add("active");
-        
-        // Set current action
-        const action = btn.getAttribute("data-action") as ClickAction;
-        this.currentAction = action;
+        // Close dropdown
+        currentActionBtn?.classList.remove("active");
+        actionDropdown?.classList.remove("active");
       });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!currentActionBtn?.contains(e.target as Node) && 
+          !actionDropdown?.contains(e.target as Node)) {
+        currentActionBtn?.classList.remove("active");
+        actionDropdown?.classList.remove("active");
+      }
     });
   }
 
@@ -1338,40 +1423,24 @@ class World {
           break;
         case "f":
         case "F":
-          this.ui.setCurrentAction("food");
-          this.updateActionButtons("food");
+          this.ui.selectAction("food");
           break;
         case "h":
         case "H":
-          this.ui.setCurrentAction("herbivore");
-          this.updateActionButtons("herbivore");
+          this.ui.selectAction("herbivore");
           break;
         case "c":
         case "C":
-          this.ui.setCurrentAction("carnivore");
-          this.updateActionButtons("carnivore");
+          this.ui.selectAction("carnivore");
           break;
         case "o":
         case "O":
-          this.ui.setCurrentAction("omnivore");
-          this.updateActionButtons("omnivore");
+          this.ui.selectAction("omnivore");
           break;
       }
     });
   }
 
-  updateActionButtons(action: ClickAction): void {
-    // Remove active class from all buttons
-    document
-      .querySelectorAll(".action-btn")
-      .forEach((b) => b.classList.remove("active"));
-    
-    // Add active class to the correct button
-    const targetBtn = document.querySelector(`[data-action="${action}"]`);
-    if (targetBtn) {
-      targetBtn.classList.add("active");
-    }
-  }
 
   createParticleEffect(
     x: number,

@@ -149,6 +149,36 @@
               </button>
             </div>
           </div>
+
+          <!-- Click Action Section -->
+          <div class="stat-section">
+            <h4><i class="fas fa-mouse-pointer"></i>Click Action</h4>
+            <div class="click-action-container">
+              <button id="currentActionBtn" class="current-action-btn">
+                <i class="fas fa-apple-alt"></i>
+                <span>Food</span>
+                <i class="fas fa-chevron-down toggle-icon"></i>
+              </button>
+              <div id="actionDropdown" class="action-dropdown">
+                <button class="action-option active" data-action="food">
+                  <i class="fas fa-apple-alt"></i>
+                  <span>Food</span>
+                </button>
+                <button class="action-option" data-action="herbivore">
+                  <div class="creature-icon herbivore"></div>
+                  <span>Herbivore</span>
+                </button>
+                <button class="action-option" data-action="carnivore">
+                  <div class="creature-icon carnivore"></div>
+                  <span>Carnivore</span>
+                </button>
+                <button class="action-option" data-action="omnivore">
+                  <div class="creature-icon omnivore"></div>
+                  <span>Omnivore</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </aside>
@@ -250,31 +280,6 @@
       <i class="fas fa-search"></i>
     </div>
 
-    <!-- Action Selector Panel -->
-    <div id="actionSelector" class="action-selector">
-      <div class="action-header">
-        <i class="fas fa-mouse-pointer"></i>
-        <span>Click Action</span>
-      </div>
-      <div class="action-buttons">
-        <button class="action-btn active" data-action="food" title="Add Food">
-          <i class="fas fa-apple-alt"></i>
-          <span>Food</span>
-        </button>
-        <button class="action-btn" data-action="herbivore" title="Add Herbivore">
-          <div class="creature-icon herbivore"></div>
-          <span>Herbivore</span>
-        </button>
-        <button class="action-btn" data-action="carnivore" title="Add Carnivore">
-          <div class="creature-icon carnivore"></div>
-          <span>Carnivore</span>
-        </button>
-        <button class="action-btn" data-action="omnivore" title="Add Omnivore">
-          <div class="creature-icon omnivore"></div>
-          <span>Omnivore</span>
-        </button>
-      </div>
-    </div>
 
     <!-- Help Tooltip -->
     <div id="helpTooltip" class="tooltip">
